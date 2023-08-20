@@ -12,7 +12,7 @@ export default async (guardsman: Guardsman, discordId: string) =>
         new EmbedBuilder()
             .setTitle(`RaidManager Verification`)
             .setDescription(
-                "Discord account verification was successful! Please run `/verify update` to obtain roles."
+                "Discord account verification was successful! Please run `/update` to obtain roles."
             )
             .setColor(Colors.Green)
             .setTimestamp()

@@ -8,6 +8,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 export default class Bot extends Client
 {
     guardsman: Guardsman;
+    REST: REST = new REST();
 
     constructor(guardsman: Guardsman)
     {
@@ -37,6 +38,7 @@ export default class Bot extends Client
 
         this.guardsman = guardsman;
 
+        this.REST.setToken(this.guardsman.environment.DISCORD_BOT_TOKEN);
         this.commands.push();
         this.events.load();
         this.login(this.guardsman.environment.DISCORD_BOT_TOKEN);
@@ -60,7 +62,7 @@ export default class Bot extends Client
                 for (const commandFile of commandFiles)
                 {
                     const commandFileStat = await lstat(`${__dirname}/commands/${categoryDir}/${commandFile}`);
-                    const commandClass = (await import(`./commands/${categoryDir}/${commandFile}${commandFileStat.isDirectory() && "/index.js" || ""}`)).default;
+                    const commandClass = (await import(`./commands/${categoryDir}/${commandFile}${commandFileStat.isDirectory() && "/index.js" || ""}?update=${Date.now()}`)).default;
                     const commandData: ICommand = new commandClass(this.guardsman);
                     
                     if (commandFileStat.isDirectory())
@@ -117,7 +119,7 @@ export default class Bot extends Client
                         {
                             if (subCommandFile.includes("index.")) continue;
 
-                            const subCommandClass = (await import(`./commands/${categoryName}/${command.name}/${subCommandFile}`)).default;
+                            const subCommandClass = (await import(`./commands/${categoryName}/${command.name}/${subCommandFile}?update=${Date.now()}`)).default;
                             const subCommandData: ICommand = new subCommandClass(this.guardsman);
 
                             const subCommand = new SlashCommandSubcommandBuilder();
@@ -139,9 +141,7 @@ export default class Bot extends Client
                 }
             }
 
-            const DiscordAPI = new REST();
-            DiscordAPI.setToken(this.guardsman.environment.DISCORD_BOT_TOKEN);
-            await DiscordAPI.put(Routes.applicationCommands(
+            await this.REST.put(Routes.applicationCommands(
                 this.guardsman.environment.DISCORD_BOT_CLIENT_ID
             ), {
                 body: parsedCommands
@@ -159,7 +159,7 @@ export default class Bot extends Client
 
             for (const eventFile of eventFiles)
             {
-                const eventFunction = (await import(`./events/${eventFile}`)).default;
+                const eventFunction = (await import(`./events/${eventFile}?update=${Date.now()}`)).default;
 
                 events.push({
                     name: eventFile.replace(/\.[^/.]+$/, ""),

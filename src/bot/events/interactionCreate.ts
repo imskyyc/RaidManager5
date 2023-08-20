@@ -77,6 +77,8 @@ export default async (guardsman: Guardsman, interaction: Interaction<"cached">) 
                 ]
             }
 
+            console.log("errored");
+
             if (replied)
             {
                 return interaction.editReply(replyData)
