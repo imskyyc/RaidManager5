@@ -1,4 +1,4 @@
-import { Colors, EmbedBuilder, Interaction, GuildScheduledEventEntityType } from "discord.js";
+import {Colors, EmbedBuilder, Interaction, GuildScheduledEventEntityType, PermissionFlagsBits} from "discord.js";
 import { Guardsman } from "index";
 
 function firstToUpper(string: string) {
@@ -50,6 +50,18 @@ export default async (guardsman: Guardsman, interaction: Interaction<"cached">) 
         }
 
         if (command.developer && interaction.member.id != "250805980491808768")
+        {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle("Command Execution Error")
+                        .setDescription(`You do not have permission to execute this command.`)
+                        .setColor(Colors.Red)
+                ]
+            })
+        }
+
+        if (typeof command.defaultMemberPermissions == "bigint" && !interaction.member.permissions.has(command.defaultMemberPermissions))
         {
             return interaction.reply({
                 embeds: [

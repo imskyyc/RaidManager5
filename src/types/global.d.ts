@@ -19,3 +19,16 @@ declare interface IEvent
     function: () => Promise<void>
 }
 
+declare type ChannelConfiguration =
+{
+    guild_id: string,
+    channel_id: string,
+    setting: string
+}
+
+declare type StoredChannelConfiguration =
+{
+    id: number,
+    created_at: Date,
+    updated_at: Date
+} & ChannelConfiguration
