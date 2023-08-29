@@ -265,7 +265,7 @@ export default class ImportEventSubcommand implements ICommand {
 
                                             {
                                                 name: "Submitted At",
-                                                value: `<t:${Date.now()}>`,
+                                                value: `<t:${Math.floor(Date.now() / 1000)}>`,
                                                 inline: true
                                             },
 
