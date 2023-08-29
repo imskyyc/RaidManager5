@@ -31,7 +31,49 @@ export default class ImportEventSubcommand implements ICommand {
             return;
         }
 
+        const requestChannelId = await this.guardsman.database<StoredChannelConfiguration>
+            ("channel_configuration")
+            .where({
+                guild_id: interaction.guild.id,
+                setting: "IMPORT_REQUESTS"
+            })
+            .first()
+
+        if (!requestChannelId)
+        {
+            await interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle("Event Import")
+                        .setDescription("No import requests channel has been configured. Please contact a guild administrator.")
+                        .setColor(Colors.Red)
+                        .setTimestamp()
+                        .setFooter({ text: "RaidManager Database" })
+                ]
+            })
+
+            return;
+        }
+
+        const requestChannel = interaction.guild.channels.resolve(requestChannelId.channel_id)
+        if (!requestChannel || !requestChannel.isTextBased())
+        {
+            await interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle("Event Import")
+                        .setDescription("No import requests channel could be found. Please contact a guild administrator.")
+                        .setColor(Colors.Red)
+                        .setTimestamp()
+                        .setFooter({ text: "RaidManager Database" })
+                ]
+            })
+
+            return;
+        }
+
         // render embed
+        let isRally = false;
         const baseEmbed = new EmbedBuilder()
             .setTitle("Event Import")
             .setDescription(`
@@ -46,6 +88,12 @@ export default class ImportEventSubcommand implements ICommand {
             .setColor(Colors.Yellow)
             .setTimestamp()
             .setFooter({ text: "RaidManager Database - Prompt will expire in 5 minutes." })
+            .addFields(
+                {
+                    name: "Is Rally",
+                    value: `${isRally}`
+                }
+            )
         const components = [
             new ActionRowBuilder<ButtonBuilder>()
                 .setComponents(
@@ -58,13 +106,23 @@ export default class ImportEventSubcommand implements ICommand {
                         .setLabel("Reset")
                         .setStyle(ButtonStyle.Danger),
                     new ButtonBuilder()
+                        .setCustomId("rally")
+                        .setLabel("Is Rally")
+                        .setStyle(ButtonStyle.Secondary),
+                    new ButtonBuilder()
                         .setCustomId("cancel")
                         .setLabel("Cancel")
                         .setStyle(ButtonStyle.Danger),
                 )
         ]
         async function renderEmbed(ignoreComponents?: boolean) {
-            const fields: EmbedField[] = [];
+            const fields: EmbedField[] = [
+                {
+                    name: "Is Rally",
+                    value: `${isRally}`,
+                    inline: false,
+                }
+            ];
 
             for (const pointValue in importData)
             {
@@ -78,7 +136,9 @@ export default class ImportEventSubcommand implements ICommand {
                 })
             }
 
-            baseEmbed.setFields(...fields)
+            baseEmbed.setFields(
+                ...fields
+            )
 
             await interaction.editReply({
                 components: ignoreComponents ? [] : components,
@@ -163,6 +223,62 @@ export default class ImportEventSubcommand implements ICommand {
                             componentCollector.stop();
                             messageCollector.stop();
 
+                            await requestChannel.send({
+                                components: [
+                                    new ActionRowBuilder<ButtonBuilder>()
+                                        .setComponents(
+                                            new ButtonBuilder()
+                                                .setCustomId("ir-import")
+                                                .setLabel("Import")
+                                                .setStyle(ButtonStyle.Success),
+
+                                            new ButtonBuilder()
+                                                .setCustomId("ir-json")
+                                                .setLabel("Download JSON")
+                                                .setStyle(ButtonStyle.Secondary),
+
+                                            new ButtonBuilder()
+                                                .setCustomId("ir-modify")
+                                                .setLabel("Modify")
+                                                .setStyle(ButtonStyle.Secondary),
+
+                                            new ButtonBuilder()
+                                                .setCustomId("ir-delete")
+                                                .setLabel("Delete")
+                                                .setStyle(ButtonStyle.Danger)
+                                        )
+                                ],
+
+                                embeds: [
+                                    new EmbedBuilder()
+                                        .setTitle("Event Import")
+                                        .setDescription("A new event import request has been submitted.")
+                                        .setColor(Colors.Green)
+                                        .setTimestamp()
+                                        .setFooter({ text: "RaidManager Database" })
+                                        .setFields(
+                                            {
+                                                name: "Submitter",
+                                                value: `<@${member.id}>`,
+                                                inline: true
+                                            },
+
+                                            {
+                                                name: "Submitted At",
+                                                value: `<t:${Date.now()}>`,
+                                                inline: true
+                                            },
+
+                                            {
+                                                name: "Is Rally",
+                                                value: `${isRally}`,
+                                            },
+
+                                            ...fields,
+                                        )
+                                ]
+                            })
+
                             await interaction.editReply({
                                 embeds: [
                                     new EmbedBuilder()
@@ -189,6 +305,42 @@ export default class ImportEventSubcommand implements ICommand {
                     await interact.deferUpdate();
 
                     break;
+                case "rally":
+                    const canChangeRally = this.guardsman.environment.RALLY_ALLOWED_SERVERS.includes(interaction.guild.id)
+
+                    if (canChangeRally)
+                    {
+                        isRally = !isRally;
+
+                        await interact.reply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle("Event Import")
+                                    .setDescription("Successfully toggled rally status.")
+                                    .setColor(Colors.Green)
+                                    .setTimestamp()
+                                    .setFooter({ text: "RaidManager Database" })
+                            ]
+                        })
+
+                        await renderEmbed();
+                    }
+                    else
+                    {
+                        await interact.reply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle("Event Import")
+                                    .setDescription("This guild is not authorized to submit rally attendance.")
+                                    .setColor(Colors.Red)
+                                    .setTimestamp()
+                                    .setFooter({ text: "RaidManager Database" })
+                            ]
+                        })
+                    }
+
+
+                    break;
                 case "reset":
                     importData = {};
                     await renderEmbed();
@@ -203,6 +355,7 @@ export default class ImportEventSubcommand implements ICommand {
             if (collected.size == 0 || stopReason == "cancel")
             {
                 await interaction.editReply({
+                    components: [],
                     embeds: [
                         new EmbedBuilder()
                             .setTitle("Event Import")

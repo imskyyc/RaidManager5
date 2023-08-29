@@ -320,4 +320,142 @@ export default async (guardsman: Guardsman, interaction: Interaction<"cached">) 
             })
         }
     }
+
+    if (interaction.isButton())
+    {
+        const buttonCommandComponents = interaction.customId.split("-");
+        const buttonCommand = buttonCommandComponents[0];
+
+        switch (buttonCommand)
+        {
+            case "ir": // import requests
+                await interaction.deferReply();
+
+                const requestCommand = buttonCommandComponents[1];
+                const embed = interaction.message.embeds[0];
+                const fields = embed.fields;
+                const isRally = fields[2].value == "true";
+                const importData: EventImportData = {};
+
+                for (const field of fields)
+                {
+                    if (!field.name.includes("Event(s)")) continue;
+                    const fieldNameComponents = field.name.split(" ");
+                    const pointValue = parseInt(fieldNameComponents[0]);
+                    const fieldValue = field.value;
+                    const mentions = fieldValue.split(", ");
+
+                    if (!importData[pointValue])
+                    {
+                        importData[pointValue] = [];
+                    }
+
+                    const reg = /(?<=<@)(.*)(?=>)/;
+                    for (const mention of mentions)
+                    {
+                        const userMatches = mention.match(reg);
+                        if (!userMatches) continue;
+
+                        importData[pointValue].push(userMatches[0]);
+                    }
+                }
+
+                switch (requestCommand)
+                {
+                    case "import":
+                        for (const pointValue in importData)
+                        {
+                            const users = importData[pointValue];
+
+                            for (const user of users)
+                            {
+                                const existingUserData = await guardsman.database<StoredUserdata>("userdata")
+                                    .select("*")
+                                    .where({
+                                        user_id: user
+                                    })
+                                    .first()
+
+                                if (existingUserData)
+                                {
+                                    await guardsman.database<Userdata>("userdata")
+                                        .update({
+                                            events_attended: existingUserData.events_attended + (isRally ? 0 : parseInt(pointValue)),
+                                            squadron_events_attended: existingUserData.squadron_events_attended + (isRally ? parseInt(pointValue) : 0)
+                                        })
+                                        .where("user_id", user)
+                                }
+                                else
+                                {
+                                    await guardsman.database<Userdata>("userdata")
+                                        .insert({
+                                            user_id: user,
+                                            in_squadron: isRally ? 1 : 0,
+                                            events_attended: isRally ? 0 : parseInt(pointValue),
+                                            squadron_events_attended: isRally ? parseInt(pointValue) : 0
+                                        })
+                                }
+                            }
+                        }
+
+                        interaction.message.edit({
+                            components: [],
+                            embeds: interaction.message.embeds
+                        });
+
+                        await interaction.editReply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle("Event Import")
+                                    .setDescription("Event data has been imported!")
+                                    .setColor(Colors.Green)
+                                    .setTimestamp()
+                                    .setFooter({ text: "RaidManager Database" })
+                            ]
+                        });
+
+                        break;
+                    case "json":
+                        const json = JSON.stringify(importData);
+
+                        await interaction.editReply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle("Event Import")
+                                    .setDescription("A JSON export has been generated.")
+                                    .setColor(Colors.Green)
+                                    .setTimestamp()
+                                    .setFooter({ text: "RaidManager Database" })
+                            ],
+
+                            files: [
+                                {
+                                    name: `IMPORT_${embed.timestamp}.json`,
+                                    description: "RaidManager Event Data Export",
+                                    attachment: Buffer.from(json)
+                                }
+                            ]
+                        })
+
+                        break;
+                    case "modify":
+                        break;
+                    case "delete":
+                        await interaction.message.delete();
+
+                        await interaction.editReply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle("Event Import")
+                                    .setDescription("Log import successfully deleted.")
+                                    .setColor(Colors.Green)
+                                    .setTimestamp()
+                                    .setFooter({ text: "RaidManager Database" })
+                            ]
+                        })
+
+                        break;
+                }
+        }
+    }
 }
