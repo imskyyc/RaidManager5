@@ -64,11 +64,11 @@ export default class BindGroupSubcommand implements ICommand
             await interaction.reply({
                 embeds: [
                    new EmbedBuilder()
-                       .setTitle("RaidManager Database")
+                       .setTitle("Guardsman Database")
                        .setDescription(`A group role bind for <@&${guildRole.id}> with those properties already exists.`)
                        .setColor(Colors.Red)
                        .setTimestamp()
-                       .setFooter({ text: "RaidManager Database" })
+                       .setFooter({ text: "Guardsman Database" })
                 ]
             });
 
@@ -85,11 +85,11 @@ export default class BindGroupSubcommand implements ICommand
         await interaction.reply({
             embeds: [
                 new EmbedBuilder()
-                    .setTitle(`RaidManager Database`)
+                    .setTitle(`Guardsman Database`)
                     .setDescription(`Successfully added a group bind for <@&${guildRole.id}> for Group ${groupId} at rank ${groupRoleBind.minRank} up to rank ${groupRoleBind.maxRank}.`)
                     .setColor(Colors.Green)
                     .setTimestamp()
-                    .setFooter({ text: "RaidManager Database" })
+                    .setFooter({ text: "Guardsman Database" })
             ]
         })
     }

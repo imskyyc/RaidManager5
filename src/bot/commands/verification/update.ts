@@ -2,7 +2,6 @@ import { ChatInputCommandInteraction, Colors, EmbedBuilder } from "discord.js";
 import { Guardsman } from "index";
 import Noblox from "noblox.js";
 import axios from "axios";
-import {parse} from "dotenv";
 
 export default class UpdateCommand implements ICommand
 {
@@ -72,7 +71,7 @@ export default class UpdateCommand implements ICommand
                     case "user":
                         const userId = bindData.userId;
 
-                        if (userId == existingUserData.roblox_id) {
+                        if (userId == existingUserData.roblox_id || userId == existingUserData.discord_id) {
                             allowedRoles.push(verificationBind);
                         }
 
@@ -108,6 +107,24 @@ export default class UpdateCommand implements ICommand
                 }
             } catch (error) {
                 errors.push(`Failed to apply a role. ${error}`);
+            }
+        }
+
+        // scan user's current roles and verify they are allowed to have them
+        console.log(member.roles.cache)
+        for (const role of member.roles.cache.keys())
+        {
+            const isBoundRole = (verificationBinds.find(r => r.role_id == role && r.guild_id == guild.id)) != null
+            const allowedRole = allowedRoles.find(r => r.role_id == role);
+
+            if (!allowedRole && isBoundRole)
+            {
+                removedRoles.push({
+                    id: -1,
+                    guild_id: guild.id,
+                    role_data: "",
+                    role_id: role,
+                })
             }
         }
 

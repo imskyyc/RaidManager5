@@ -50,11 +50,11 @@ export default class BindGamePassSubcommand implements ICommand {
             await interaction.reply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle("RaidManager Database")
+                        .setTitle("Guardsman Database")
                         .setDescription(`A gamepass role bind for <@&${guildRole.id}> with those properties already exists.`)
                         .setColor(Colors.Red)
                         .setTimestamp()
-                        .setFooter({text: "RaidManager Database"})
+                        .setFooter({text: "Guardsman Database"})
                 ]
             });
 
@@ -71,11 +71,11 @@ export default class BindGamePassSubcommand implements ICommand {
         await interaction.reply({
             embeds: [
                 new EmbedBuilder()
-                    .setTitle(`RaidManager Database`)
+                    .setTitle(`Guardsman Database`)
                     .setDescription(`Successfully added a gamepass bind for <@&${guildRole.id}> for gamepass ${gamepassId}.`)
                     .setColor(Colors.Green)
                     .setTimestamp()
-                    .setFooter({text: "RaidManager Database"})
+                    .setFooter({text: "Guardsman Database"})
             ]
         })
     }

@@ -49,11 +49,6 @@ declare type RoleDataGamePassBind =
     gamepassId?: number
 }
 
-declare type RoleDataRoleBind =
-{
-    roleId?: string
-}
-
 declare type RoleData<T> =
 {
     type: string
