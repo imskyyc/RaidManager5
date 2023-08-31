@@ -54,7 +54,10 @@ class GuardsmanObject
         // this.roblox.setCookie(this.environment.ROBLOX_COOKIE);
 
         this.log.debug("Running database migrations...");
-        this.database.migrate.latest();
+        this.database.migrate.latest().then(() =>
+        {
+            this.log.debug("Database migration complete.");
+        });
 
         this.log.info("Initializing API...");
         this.api = new API(this);

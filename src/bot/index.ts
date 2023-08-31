@@ -39,8 +39,9 @@ export default class Bot extends Client
         this.guardsman = guardsman;
 
         this.REST.setToken(this.guardsman.environment.DISCORD_BOT_TOKEN);
-        this.commands.push();
-        this.events.load();
+        this.commands.push().then(() => { this.guardsman.log.debug("Commands pushed.") });
+        this.events.load().then(() => { this.guardsman.log.debug("Events loaded.") });
+
         this.login(this.guardsman.environment.DISCORD_BOT_TOKEN);
     }
 
