@@ -64,9 +64,9 @@ declare type Userdata =
     in_squadron: number,
     events_attended: number,
     squadron_events_attended: number,
-    squadron_last_promoted: Date,
+    squadron_last_promoted?: Date,
     squadron_medals: string,
-    squadron_loa_start_date: Date,
+    squadron_loa_start_date?: Date,
 }
 
 declare type StoredUserdata =
