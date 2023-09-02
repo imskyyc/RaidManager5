@@ -7,9 +7,9 @@ import {
 } from "discord.js";
 import { Guardsman } from "index";
 
-export default class SetSquadronCommand implements ICommand
+export default class SetSquadronSubcommand implements ICommand
 {
-    name: Lowercase<string> = "setsquadron";
+    name: Lowercase<string> = "set";
     description: string = "Toggles squadron status for the provided user.";
     defaultMemberPermissions = PermissionFlagsBits.ModerateMembers;
     guardsman: Guardsman;

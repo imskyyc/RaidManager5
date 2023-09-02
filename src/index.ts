@@ -51,7 +51,7 @@ class GuardsmanObject
 
         this.log.debug("Connecting to ROBLOX API...")
         this.roblox = Noblox;
-        // this.roblox.setCookie(this.environment.ROBLOX_COOKIE);
+        this.roblox.setCookie(this.environment.ROBLOX_COOKIE).then(_ => console.log);
 
         this.log.debug("Running database migrations...");
         this.database.migrate.latest().then(() =>
