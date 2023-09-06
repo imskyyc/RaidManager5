@@ -4,8 +4,9 @@ import logger from "./util/log.js";
 import { config } from "dotenv";
 import Noblox from "noblox.js";
 import API from "./api/index.js";
+import Trello from "trello";
 
-export enum GuardsmanState 
+export enum GuardsmanState
 {
     OFFLINE,
     STARTING,
@@ -21,6 +22,7 @@ class GuardsmanObject
     environment = config().parsed || {};
     database: Knex;
     roblox: typeof Noblox;
+    trello: typeof Trello;
 
     api: API;
     bot: Bot;
@@ -28,6 +30,8 @@ class GuardsmanObject
     constructor()
     {
         this.log = new logger("RaidManager", this);
+
+        this.trello = new Trello(this.environment.TRELLO_APP_KEY, this.environment.TRELLO_TOKEN);
 
         this.log.info("Initializing Guardsman...");
         this.state = GuardsmanState.STARTING;

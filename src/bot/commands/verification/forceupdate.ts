@@ -29,10 +29,10 @@ export default class UpdateCommand implements ICommand
     }
 
     async execute(interaction: ChatInputCommandInteraction<"cached">): Promise<void> {
-        const member = interaction.member;
         const guild = interaction.guild;
 
-        const user = await interaction.options.getUser("user", true);
+        const user = interaction.options.getUser("user", true);
+        const guildMember = interaction.guild.members.resolve(user.id);
 
         const existingUserData = await this.guardsman.database<IUser>("users")
             .where("discord_id", user.id)
@@ -44,6 +44,22 @@ export default class UpdateCommand implements ICommand
                     new EmbedBuilder()
                         .setTitle("Guardsman Verification")
                         .setDescription(`<@${user.id} is not verified with Guardsman.`)
+                        .setColor(Colors.Red)
+                        .setTimestamp()
+                        .setFooter({text: "Guardsman Verification"})
+                ]
+            })
+
+            return;
+        }
+
+        if (!guildMember)
+        {
+            await interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setTitle("Guardsman Verification")
+                        .setDescription(`<@${user.id} is not a member of this guild.`)
                         .setColor(Colors.Red)
                         .setTimestamp()
                         .setFooter({text: "Guardsman Verification"})
@@ -110,7 +126,7 @@ export default class UpdateCommand implements ICommand
 
                         break;
                     case "role":
-                        const canAddRole = member.roles.resolve(verificationBind.role_id)
+                        const canAddRole = guildMember.roles.resolve(verificationBind.role_id)
                             || allowedRoles.find(role => role.role_id == verificationBind.role_id);
 
                         if (canAddRole != null) {
@@ -127,8 +143,8 @@ export default class UpdateCommand implements ICommand
         }
 
         // scan user's current roles and verify they are allowed to have them
-        console.log(member.roles.cache)
-        for (const role of member.roles.cache.keys())
+        console.log(guildMember.roles.cache)
+        for (const role of guildMember.roles.cache.keys())
         {
             const isBoundRole = (verificationBinds.find(r => r.role_id == role && r.guild_id == guild.id)) != null
             const allowedRole = allowedRoles.find(r => r.role_id == role);
@@ -154,12 +170,12 @@ export default class UpdateCommand implements ICommand
         // remove roles
         for (const removedRole of removedRoles)
         {
-            const userRole = member.roles.resolve(removedRole.role_id);
+            const userRole = guildMember.roles.resolve(removedRole.role_id);
             if (userRole)
             {
                 try
                 {
-                    await member.roles.remove(removedRole.role_id);
+                    await guildMember.roles.remove(removedRole.role_id);
                 }
                 catch (error: any)
                 {
@@ -171,7 +187,7 @@ export default class UpdateCommand implements ICommand
         // add roles
         for (const allowedRole of allowedRoles)
         {
-            const userRole = member.roles.resolve(allowedRole.role_id);
+            const userRole = guildMember.roles.resolve(allowedRole.role_id);
             if (!userRole)
             {
                 const guildRole = guild.roles.resolve(allowedRole.role_id);
@@ -183,7 +199,7 @@ export default class UpdateCommand implements ICommand
 
                 try
                 {
-                    await member.roles.add(guildRole);
+                    await guildMember.roles.add(guildRole);
                 }
                 catch (error: any)
                 {

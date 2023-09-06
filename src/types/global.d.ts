@@ -1,4 +1,6 @@
-declare interface ICommand 
+declare module 'trello';
+
+declare interface ICommand
 {
     name: Lowercase<string>;
     description: string;
