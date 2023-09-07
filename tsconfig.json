@@ -112,6 +112,7 @@
     "src/types/user.d.ts",
     "src/types/servers.d.ts",
     "src/types/api.d.ts",
+    "src/types/trello.d.ts"
   ],
 
   "include": ["./src"]

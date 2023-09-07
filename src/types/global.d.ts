@@ -1,5 +1,3 @@
-declare module 'trello';
-
 declare interface ICommand
 {
     name: Lowercase<string>;

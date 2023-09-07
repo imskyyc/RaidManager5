@@ -1,10 +1,11 @@
 import knex, { Knex } from "knex";
 import Bot from "./bot/index.js";
 import logger from "./util/log.js";
+import trello from "./util/trello.js";
 import { config } from "dotenv";
 import Noblox from "noblox.js";
 import API from "./api/index.js";
-import Trello from "trello";
+import {Board} from "./types/trello";
 
 export enum GuardsmanState
 {
@@ -18,11 +19,12 @@ class GuardsmanObject
 {
     state: GuardsmanState = GuardsmanState.OFFLINE
     log;
+    trello: trello;
+    mainBoard?: Board;
     debug = process.argv.includes("--debug")
     environment = config().parsed || {};
     database: Knex;
     roblox: typeof Noblox;
-    trello: typeof Trello;
 
     api: API;
     bot: Bot;
@@ -31,10 +33,14 @@ class GuardsmanObject
     {
         this.log = new logger("RaidManager", this);
 
-        this.trello = new Trello(this.environment.TRELLO_APP_KEY, this.environment.TRELLO_TOKEN);
-
         this.log.info("Initializing Guardsman...");
         this.state = GuardsmanState.STARTING;
+
+        this.trello = new trello(this.environment.TRELLO_APP_KEY, this.environment.TRELLO_TOKEN);
+        this.trello.boards.getBoard(this.environment.TRELLO_BOARD_ID).then(board => {
+            this.mainBoard = board;
+        });
+
 
         this.log.debug("Connecting to database...")
         this.database = knex({

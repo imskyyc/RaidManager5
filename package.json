@@ -1,5 +1,5 @@
 {
-  "name": "test-node",
+  "name": "raidmanager5",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -21,7 +21,6 @@
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "noblox.js": "^4.14.1",
-    "trello": "^0.11.0",
     "typescript": "^5.1.6"
   }
 }
