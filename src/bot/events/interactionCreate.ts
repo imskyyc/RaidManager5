@@ -89,8 +89,6 @@ export default async (guardsman: Guardsman, interaction: Interaction<"cached">) 
                 ]
             }
 
-            console.log("errored");
-
             if (replied)
             {
                 return interaction.editReply(replyData)
@@ -422,10 +420,9 @@ export default async (guardsman: Guardsman, interaction: Interaction<"cached">) 
 
                                     for (const memberCard of memberCards)
                                     {
-                                        console.log(memberCard.name, userInfo.username);
                                         if (memberCard.name.includes(userInfo.username))
                                         {
-                                            memberCard.addComment(`${new Date(date[0]).toDateString()}
+                                            memberCard.addComment(`${new Date(parseInt(date[0]) * 1000).toDateString()}
                                             Host: ${submitterUserData.username}
                                             Event Type: Rally`)
                                         }
