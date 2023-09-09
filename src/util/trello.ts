@@ -1,16 +1,4 @@
 import axios from "axios";
-import {
-    APIArchiveListData,
-    APIMakeCardData,
-    Board,
-    Card,
-    Comment,
-    Cover,
-    Label,
-    List,
-    ListWithCards,
-    Prefs
-} from "../types/trello";
 
 export class TrelloBoard implements Board {
     private readonly key: string = "";

@@ -5,7 +5,6 @@ import trello from "./util/trello.js";
 import { config } from "dotenv";
 import Noblox from "noblox.js";
 import API from "./api/index.js";
-import {Board} from "./types/trello";
 
 export enum GuardsmanState
 {

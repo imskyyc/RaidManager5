@@ -1,5 +1,5 @@
 // Boards
-export interface Board
+declare interface Board
 {
     id: string
     name: string
@@ -23,7 +23,7 @@ export interface Board
     makeList: (name: string, fields?: { [name: string]: any }) => Promise<APIMakeCardData>
 }
 
-export interface Prefs
+declare interface Prefs
 {
     permissionLevel: "private" | "public"
     hideVotes: boolean
@@ -52,13 +52,13 @@ export interface Prefs
     canInvite: boolean
 }
 
-export interface SwitcherView
+declare interface SwitcherView
 {
     viewType: string
     enabled: boolean
 }
 
-export interface ScaledBackgroundImage
+declare interface ScaledBackgroundImage
 {
     width: number
     height: number
@@ -66,7 +66,7 @@ export interface ScaledBackgroundImage
 }
 
 // Lists
-export interface List
+declare interface List
 {
     board: Board
     id: string
@@ -86,7 +86,7 @@ export interface List
     makeCard: (name: string, description?: string, fields?: { [name: string]: any}) => Promise<Card>
 }
 
-export interface ListWithCards
+declare interface ListWithCards
 {
     id: string
     name: string
@@ -94,7 +94,7 @@ export interface ListWithCards
 }
 
 // Cards
-export interface ListAPICard
+declare interface ListAPICard
 {
     id: string
     name: string
@@ -102,7 +102,7 @@ export interface ListAPICard
     labels: Label[]
 }
 
-export interface APIMakeCardData
+declare interface APIMakeCardData
 {
     id: string
     name: string
@@ -113,7 +113,7 @@ export interface APIMakeCardData
     limits: { [any]: any }
 }
 
-export interface APIArchiveListData
+declare interface APIArchiveListData
 {
     id: string
     name: string
@@ -123,7 +123,7 @@ export interface APIArchiveListData
     status?: any
 }
 
-export interface Card
+declare interface Card
 {
     id: string
     list: List
@@ -192,7 +192,7 @@ export interface Card
     removeLabel: (label: Label) => Promise<boolean>
 }
 
-export interface Label
+declare interface Label
 {
     id: string
     idBoard: string
@@ -201,7 +201,7 @@ export interface Label
     uses: number
 }
 
-export interface Cover
+declare interface Cover
 {
     idAttachment: string
     color: any
@@ -211,7 +211,7 @@ export interface Cover
     idPlugin: any
 }
 
-export interface Comment
+declare interface Comment
 {
     id: string
     idMemberCreator: string
