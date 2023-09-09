@@ -24,7 +24,7 @@
 <h2> Installation </h2>
 
 1. Clone the [RaidManager](https://github.com/imskyyc/RaidManager5/) repository to whatever directory you'd like. <br />
-   <code>git clone https://github.com/Nuclear-Engineering-Co/NECos </code>
+   <code>git clone https://github.com/imskyyc/RaidManager5 </code>
 
 2. Install node dependencies via your preferred package manager. <br />
 3. Copy the `.env.example` file to `.env`. **The application will NOT start without valid configuration.** See `configuration` below. <br />
