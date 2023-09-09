@@ -12,6 +12,15 @@ export interface Board
     shortUrl: string
     prefs: Prefs
     labelNames: { [color: string]: string }
+
+    getUrl: (baseUrl: string) => Promise<string>
+    getLabels: () => Promise<Label[]>
+    getLabel: (name: string) => Promise<Label | undefined>
+    getLists: () => Promise<List[]>
+    getList: (name: string) => Promise<List | undefined>
+    getListById: (id: string) => Promise<List | undefined>
+    getListsAndCards: (excludeLabels?: boolean) => Promise<ListWithCards[]>
+    makeList: (name: string, fields?: { [name: string]: any }) => Promise<APIMakeCardData>
 }
 
 export interface Prefs
@@ -59,6 +68,7 @@ export interface ScaledBackgroundImage
 // Lists
 export interface List
 {
+    board: Board
     id: string
     name: string
     closed: boolean
@@ -67,6 +77,13 @@ export interface List
     subscribed: boolean
     softLimit?: any
     status?: any
+
+    getCards: () => Promise<Card[]>
+    getBoard: () => Board
+    getCard: (name: string) => Promise<Card | undefined>
+    archiveAllCards: () => Promise<boolean>
+    setArchived: (archived: boolean) => Promise<APIArchiveListData>
+    makeCard: (name: string, description?: string, fields?: { [name: string]: any}) => Promise<Card>
 }
 
 export interface ListWithCards
@@ -96,9 +113,20 @@ export interface APIMakeCardData
     limits: { [any]: any }
 }
 
+export interface APIArchiveListData
+{
+    id: string
+    name: string
+    closed: boolean
+    idBoard: string
+    pos: number
+    status?: any
+}
+
 export interface Card
 {
     id: string
+    list: List
     badges: {
         attachmentsByType: {
             trello: {
@@ -154,6 +182,14 @@ export interface Card
     cover: Cover
     isTemplate: boolean
     cardRole: any
+
+    getList: () => List
+    setArchived: (archived: boolean) => Promise<APIArchiveListData>
+    deleteCard: () => Promise<boolean>
+    getComments: () => Promise<Comment[]>
+    addComment: (text: string) => Promise<Comment>
+    addLabel: (label: Label) => Promise<boolean>
+    removeLabel: (label: Label) => Promise<boolean>
 }
 
 export interface Label
@@ -173,4 +209,52 @@ export interface Cover
     size: string
     brightness: string
     idPlugin: any
+}
+
+export interface Comment
+{
+    id: string
+    idMemberCreator: string
+    data: {
+        text: string
+        textData: { emoji: { [any]: any } }
+        card: Card
+        board: Board
+        list: List
+    }
+
+    appCreator: {
+        id: string
+    }
+    type: string
+    date: Date
+    limits: {
+        reactions: {
+            perAction: any
+            uniquePerAction: any
+        }
+    }
+    display: {
+        translationKey: string
+        entities: {
+            contextOn: any
+
+        }
+    }
+    entities: any[]
+    memberCreator: {
+        id: string
+        activityBlocked: boolean
+        avatarHash: string
+        avatarUrl: string
+        fullName: string
+        idMemberReferrer: any
+        initials: string
+        nonPublic: any
+        nonPublicAvailable: boolean
+        username: string
+    }
+
+    deleteComment: () => Promise<boolean>
+    updateComment: (text: string) => Promise<Comment>
 }

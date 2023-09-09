@@ -37,8 +37,17 @@ class GuardsmanObject
         this.state = GuardsmanState.STARTING;
 
         this.trello = new trello(this.environment.TRELLO_APP_KEY, this.environment.TRELLO_TOKEN);
-        this.trello.boards.getBoard(this.environment.TRELLO_BOARD_ID).then(board => {
+        this.trello.getBoard(this.environment.TRELLO_BOARD_ID).then(async board => {
             this.mainBoard = board;
+
+            const managementLabel = await board.getLabel("Trello Access");
+            if (!managementLabel) return;
+
+            const testList = await board.getList("test");
+            if (!testList) return;
+
+            const newCard = await testList.makeCard("api", "wooooo");
+            await newCard.addLabel(managementLabel).then(console.log);
         });
 
 

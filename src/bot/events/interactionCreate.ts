@@ -334,8 +334,31 @@ export default async (guardsman: Guardsman, interaction: Interaction<"cached">) 
                 const requestCommand = buttonCommandComponents[1];
                 const embed = interaction.message.embeds[0];
                 const fields = embed.fields;
+                const submitter = embed.fields[0].value.match(/(?<=<@)(.*)(?=>)/) || ["0"];
+                const date = fields[1].value.match(/(?<=<t:)(.*)(?=>)/) || [Date.now().toString()];
                 const isRally = fields[2].value == "true";
                 const importData: EventImportData = {};
+
+                let submitterUserData: IUser | undefined = await guardsman.database<IUser>("users")
+                    .select("*")
+                    .where("discord_id", submitter[0])
+                    .first();
+
+                if (!submitterUserData)
+                {
+                    submitterUserData = {
+                        created_at: undefined,
+                        discord_id: "",
+                        id: 0,
+                        password: "",
+                        remember_token: "",
+                        roblox_id: "",
+                        roles: "",
+                        updated_at: undefined,
+                        username: "Unknown"
+
+                    }
+                }
 
                 for (const field of fields)
                 {
@@ -363,12 +386,52 @@ export default async (guardsman: Guardsman, interaction: Interaction<"cached">) 
                 switch (requestCommand)
                 {
                     case "import":
+                        // trello check
+                        const memberCards = [];
+                        if (guardsman.mainBoard && isRally)
+                        {
+                            const rallyAttendanceLists = JSON.parse(guardsman.environment.TRELLO_ATTENDANCE_LISTS);
+                            for (const listId of rallyAttendanceLists)
+                            {
+                                const list = await guardsman.mainBoard.getListById(listId);
+                                if (!list) continue;
+
+                                const cards = await list.getCards();
+                                for (const card of cards)
+                                {
+                                    memberCards.push(card);
+                                }
+                            }
+                        }
+
                         for (const pointValue in importData)
                         {
                             const users = importData[pointValue];
 
                             for (const user of users)
                             {
+                                // trello
+                                if (memberCards.length > 0 && parseInt(pointValue) > 0)
+                                {
+                                    const userInfo = await guardsman.database<IUser>("users")
+                                        .select("*")
+                                        .where("discord_id", user)
+                                        .first();
+
+                                    if (!userInfo) continue;
+
+                                    for (const memberCard of memberCards)
+                                    {
+                                        console.log(memberCard.name, userInfo.username);
+                                        if (memberCard.name.includes(userInfo.username))
+                                        {
+                                            memberCard.addComment(`${new Date(date[0]).toDateString()}
+                                            Host: ${submitterUserData.username}
+                                            Event Type: Rally`)
+                                        }
+                                    }
+                                }
+
                                 const existingUserData = await guardsman.database<StoredUserdata>("userdata")
                                     .select("*")
                                     .where({
