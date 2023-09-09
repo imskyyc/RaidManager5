@@ -424,7 +424,8 @@ export default async (guardsman: Guardsman, interaction: Interaction<"cached">) 
                                         {
                                             memberCard.addComment(`${new Date(parseInt(date[0]) * 1000).toDateString()}
                                             Host: ${submitterUserData.username}
-                                            Event Type: Rally`)
+                                            Event Type: Rally
+                                            Credit: ${pointValue}`)
                                         }
                                     }
                                 }
