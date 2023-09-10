@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, Client, Collection, IntentsBitField, REST,
 import { Guardsman } from "../index.js";
 import { readdir, lstat } from "fs/promises";
 import * as url from 'url';
+import * as process from "process";
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -148,7 +149,7 @@ export default class Bot extends Client
             if (this.guardsman.ci)
             {
                 this.guardsman.log.info("Command push disabled in CI mode. Command parse successful.")
-                return;
+                process.exit(0);
             }
 
             await this.REST.put(Routes.applicationCommands(
