@@ -115,5 +115,5 @@
     "src/types/trello.d.ts"
   ],
 
-  "include": ["./src"]
+  "include": ["./src", "./migrations"]
 }
