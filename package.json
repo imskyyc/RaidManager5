@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf ./build && tsc && mkdir build/api/middleware",
-    "ci": "npm run build && node build/index.js --ci"
+    "build": "rm -rf ./build && tsc && mkdir build/src/api/middleware",
+    "ci": "npm run build && node build/src/index.js --ci"
   },
   "author": "",
   "license": "ISC",
