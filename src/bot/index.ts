@@ -42,7 +42,10 @@ export default class Bot extends Client
         this.commands.push().then(() => { this.guardsman.log.debug("Commands pushed.") });
         this.events.load().then(() => { this.guardsman.log.debug("Events loaded.") });
 
-        this.login(this.guardsman.environment.DISCORD_BOT_TOKEN);
+        if (!guardsman.ci)
+        {
+            this.login(this.guardsman.environment.DISCORD_BOT_TOKEN);
+        }
     }
 
     pendingVerificationInteractions: { [discordId: string]: ChatInputCommandInteraction<"cached"> } = {}
@@ -140,6 +143,12 @@ export default class Bot extends Client
 
                     parsedCommands.push(slashCommand.toJSON())
                 }
+            }
+
+            if (this.guardsman.ci)
+            {
+                this.guardsman.log.info("Command push disabled in CI mode. Command parse successful.")
+                return;
             }
 
             await this.REST.put(Routes.applicationCommands(
