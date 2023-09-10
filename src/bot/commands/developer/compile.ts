@@ -1,5 +1,5 @@
 import { Guardsman } from "index";
-import {ChatInputCommandInteraction, SlashCommandNumberOption, SlashCommandStringOption} from "discord.js";
+import {ChatInputCommandInteraction} from "discord.js";
 import { exec } from "child_process";
 
 export default class PullCommand implements ICommand
@@ -18,7 +18,7 @@ export default class PullCommand implements ICommand
     {
         await interaction.reply("Compiling...");
 
-        exec("rm -rf ./build && tsc && mkdir ./build/api/middleware", async (error, stdout, stderr) =>
+        exec("npm run build", async (error, _1, _2) =>
         {
             if (error)
             {
