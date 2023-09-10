@@ -6,6 +6,8 @@ import { config } from "dotenv";
 import Noblox from "noblox.js";
 import API from "./api/index.js";
 import * as process from "process";
+import url from "url";
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export enum GuardsmanState
 {
@@ -61,6 +63,9 @@ class GuardsmanObject {
         this.log.debug("Connecting to database...")
         this.database = knex({
             client: this.environment.DB_CONNECTION,
+            migrations: {
+                directory: `${__dirname}/../migrations`
+            },
             connection: {
                 host: this.environment.DB_HOST,
                 port: parseInt(this.environment.DB_PORT),
