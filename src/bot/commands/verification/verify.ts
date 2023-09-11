@@ -125,7 +125,7 @@ export default class VerifyCommand implements ICommand
         await this.guardsman.database<IVerificationConfirmation>("pending_verification")
         .insert({
             discord_id: interaction.member.id,
-            token: token
+            token: `${token}+${member.id}`
         })
 
         this.guardsman.bot.pendingVerificationInteractions[member.id] = interaction;
@@ -139,7 +139,7 @@ export default class VerifyCommand implements ICommand
                         new ButtonBuilder()
                             .setLabel("Login with ROBLOX")
                             .setStyle(ButtonStyle.Link)
-                            .setURL(`https://authorize.roblox.com/?client_id=4867445835952456015&response_type=Code&redirect_uri=https%3A%2F%2Fguardsman-discord.bunkerbravointeractive.com%2Fverification-callback&scope=openid+profile&state=${token}&nonce=0&step=accountConfirm&nl=true&nl=true`)
+                            .setURL(`https://authorize.roblox.com/?client_id=4867445835952456015&response_type=Code&redirect_uri=${encodeURI(this.guardsman.environment.APP_URL)}verification-callback&scope=openid+profile&state=${token}&nonce=0&step=accountConfirm&nl=true&nl=true`)
                     )
             ],
 

@@ -90,7 +90,7 @@ export default async (guardsman: Guardsman, request: Request, response: Response
                 discord_id: pendingVerificationUser.discord_id
               })
 
-          response.redirect("https://guardsman.bunkerbravointeractive.com/verification-complete")
+          response.redirect(guardsman.environment.VERIFICATION_COMPLETE_URI || "https://guardsman.bunkerbravointeractive.com/verification-complete")
 
           guardsman.bot.emit("verificationComplete", pendingVerificationUser.discord_id, username.toString());
         })
