@@ -120,12 +120,12 @@ export default class VerifyCommand implements ICommand
             if (!continueVerification) return;
         }
 
-        const token = randomUUID().replace("-", "");
+        const token = randomUUID().replace("-", "") + `+${member.id}`;
 
         await this.guardsman.database<IVerificationConfirmation>("pending_verification")
         .insert({
             discord_id: interaction.member.id,
-            token: `${token}+${member.id}`
+            token: token
         })
 
         this.guardsman.bot.pendingVerificationInteractions[member.id] = interaction;
@@ -139,7 +139,7 @@ export default class VerifyCommand implements ICommand
                         new ButtonBuilder()
                             .setLabel("Login with ROBLOX")
                             .setStyle(ButtonStyle.Link)
-                            .setURL(`https://authorize.roblox.com/?client_id=4867445835952456015&response_type=Code&redirect_uri=${encodeURI(this.guardsman.environment.APP_URL)}verification-callback&scope=openid+profile&state=${token}+${member.id}&nonce=0&step=accountConfirm&nl=true&nl=true`)
+                            .setURL(`https://authorize.roblox.com/?client_id=4867445835952456015&response_type=Code&redirect_uri=${encodeURI(this.guardsman.environment.APP_URL)}verification-callback&scope=openid+profile&state=${token}&nonce=0&step=accountConfirm&nl=true&nl=true`)
                     )
             ],
 
