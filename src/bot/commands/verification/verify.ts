@@ -120,7 +120,7 @@ export default class VerifyCommand implements ICommand
             if (!continueVerification) return;
         }
 
-        const token = randomUUID().replace("-", "") + `+${member.id}`;
+        const token = randomUUID().replace("-", "") + `-${member.id}`;
 
         await this.guardsman.database<IVerificationConfirmation>("pending_verification")
         .insert({
