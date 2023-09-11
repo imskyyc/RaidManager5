@@ -125,7 +125,7 @@ export default class VerifyCommand implements ICommand
         await this.guardsman.database<IVerificationConfirmation>("pending_verification")
         .insert({
             discord_id: interaction.member.id,
-            token: `${token}+${member.id}`
+            token: `${token}-${member.id}`
         })
 
         this.guardsman.bot.pendingVerificationInteractions[member.id] = interaction;
