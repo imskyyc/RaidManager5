@@ -18,7 +18,7 @@ export default class ClearPendingVerifications implements ICommand
         await interaction.reply("Clearing...")
 
         this.guardsman.database<IVerificationConfirmation>("pending_verification")
-            .delete();
+            .del();
 
         await interaction.editReply("Cleared!")
     }
