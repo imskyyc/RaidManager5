@@ -55,6 +55,7 @@ export default class VerifyCommand implements ICommand
                 })
     
                 await interaction.reply({
+                    ephemeral: true,
                     components: [
                         new ActionRowBuilder<ButtonBuilder>()
                             .addComponents(
@@ -115,8 +116,6 @@ export default class VerifyCommand implements ICommand
                 })
             })
 
-            console.log(continueVerification);
-
             if (!continueVerification) return;
         }
 
@@ -146,7 +145,7 @@ export default class VerifyCommand implements ICommand
             embeds: [
                 new EmbedBuilder()
                     .setTitle("Guardsman Verification")
-                    .setDescription("This guild utilizes guardsman verification in order to verify the identities of those joining. Please log in with ROBLOX to continue.")
+                    .setDescription("This guild utilizes guardsman verification in order to verify the identities of those joining. Please log in with ROBLOX to continue. **Do not share your verification link with anybody!**")
                     .setColor(Colors.Blurple)
                     .setTimestamp()
                     .setFooter({ text: "Guardsman Verification - Prompt will time out in 5 minutes." })
@@ -159,7 +158,10 @@ export default class VerifyCommand implements ICommand
         }
         else
         {
-            await interaction.reply(replyData);
+            await interaction.reply({
+                ephemeral: true,
+                ...replyData
+            });
         }
     }
 }
