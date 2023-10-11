@@ -138,7 +138,7 @@ export default class VerifyCommand implements ICommand
                         new ButtonBuilder()
                             .setLabel("Login with ROBLOX")
                             .setStyle(ButtonStyle.Link)
-                            .setURL(`https://authorize.roblox.com/?client_id=${this.guardsman.environment.ROBLOX_CLIENT_ID}response_type=Code&redirect_uri=${encodeURI(this.guardsman.environment.APP_URL)}verification-callback&scope=openid+profile&state=${token}&nonce=0&step=accountConfirm&nl=true&nl=true`)
+                            .setURL(`https://authorize.roblox.com/?client_id=${this.guardsman.environment.ROBLOX_CLIENT_ID}&response_type=Code&redirect_uri=${encodeURI(this.guardsman.environment.APP_URL)}verification-callback&scope=openid+profile&state=${token}&nonce=0&step=accountConfirm&nl=true&nl=true`)
                     )
             ],
 
