@@ -11,14 +11,14 @@ export default async (guardsman: Guardsman, discordId: string) =>
     
             embeds: [
             new EmbedBuilder()
-                .setTitle(`L.I.A.A.S Verification`)
+                .setTitle(`RaidManager Verification`)
                 .setDescription(
                     "Discord account verification was successful! Please run `/update` to obtain roles."
                 )
                 .setColor(Colors.Green)
                 .setTimestamp()
                 .setFooter({
-                    text: "L.I.A.A.S Verification"
+                    text: "RaidManager Verification"
                 }),
             ],
         });
