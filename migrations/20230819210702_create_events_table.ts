@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
         table.string("type").notNullable();
         table.integer("length").notNullable();
         table.integer("date").notNullable();
-        table.text("notes", "LONGTEXT")
+        table.text("notes", "LONGTEXT");
     })
 }
 

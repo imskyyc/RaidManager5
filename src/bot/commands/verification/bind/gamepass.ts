@@ -3,13 +3,15 @@ import {
     ApplicationCommandOptionBase,
     ChatInputCommandInteraction, Colors, EmbedBuilder,
     SlashCommandNumberOption,
-    SlashCommandRoleOption
+    SlashCommandRoleOption,
+    PermissionFlagsBits
 } from "discord.js";
 
 export default class BindGamePassSubcommand implements ICommand {
     name: Lowercase<string> = "gamepass";
     description: string = "Allows guild administrators to bind ROBLOX gamepass data to the guild for users to obtain roles.";
     guardsman: Guardsman;
+    defaultMemberPermissions = PermissionFlagsBits.ManageRoles;
     options: ApplicationCommandOptionBase[] = [
         new SlashCommandRoleOption()
             .setName("role")

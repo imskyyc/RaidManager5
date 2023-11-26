@@ -8,7 +8,8 @@ export async function up(knex: Knex): Promise<void> {
         table.string("guild_id").notNullable();
         table.string("channel_id").notNullable();
         table.string("setting").notNullable();
-        table.timestamps();
+        table.dateTime('created_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));
+        table.dateTime('updated_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
     })
 }
 

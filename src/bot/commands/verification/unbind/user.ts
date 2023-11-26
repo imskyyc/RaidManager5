@@ -2,7 +2,8 @@ import { Guardsman } from "index";
 import {
     ApplicationCommandOptionBase,
     ChatInputCommandInteraction, Colors, EmbedBuilder,
-    SlashCommandRoleOption, SlashCommandStringOption
+    SlashCommandRoleOption, SlashCommandStringOption,
+    PermissionFlagsBits
 } from "discord.js";
 
 export default class UnbindUserSubcommand implements ICommand
@@ -10,6 +11,7 @@ export default class UnbindUserSubcommand implements ICommand
     name: Lowercase<string> = "user";
     description: string = "Allows guild administrators to unbind a specific user from the guild.";
     guardsman: Guardsman;
+    defaultMemberPermissions = PermissionFlagsBits.ManageRoles;
     options: ApplicationCommandOptionBase[] = [
         new SlashCommandRoleOption()
             .setName("role")
@@ -77,7 +79,7 @@ export default class UnbindUserSubcommand implements ICommand
             embeds: [
                 new EmbedBuilder()
                     .setTitle(`Guardsman Database`)
-                    .setDescription(`Successfully added a user bind for <@&${guildRole.id}> for user <@${userId}> (${userId}).`)
+                    .setDescription(`Successfully removed a user bind for <@&${guildRole.id}> for user ${userId}.`)
                     .setColor(Colors.Green)
                     .setTimestamp()
                     .setFooter({ text: "Guardsman Database" })

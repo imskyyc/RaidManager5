@@ -2,26 +2,18 @@ import {
     ChatInputCommandInteraction,
     Colors,
     EmbedBuilder,
-    PermissionFlagsBits,
-    SlashCommandUserOption
+    PermissionFlagsBits
 } from "discord.js";
 import { Guardsman } from "index";
 import Noblox from "noblox.js";
 import axios from "axios";
 
-export default class UpdateCommand implements ICommand
+export default class UpdateAllCommand implements ICommand
 {
-    name: Lowercase<string> = "forceupdate";
-    description: string = "Allows guild admins to force update a user's Discord roles.";
+    name: Lowercase<string> = "updateall";
+    description: string = "Allows guild administrators to update all members of a guild.";
     guardsman: Guardsman;
-    defaultMemberPermissions = PermissionFlagsBits.ModerateMembers
-
-    options = [
-        new SlashCommandUserOption()
-            .setName("user")
-            .setDescription("The user to update.")
-            .setRequired(true)
-    ]
+    defaultMemberPermissions = PermissionFlagsBits.Administrator;
 
     constructor(guardsman: Guardsman)
     {
@@ -31,54 +23,48 @@ export default class UpdateCommand implements ICommand
     async execute(interaction: ChatInputCommandInteraction<"cached">): Promise<void> {
         const guild = interaction.guild;
 
-        const user = interaction.options.getUser("user", true);
-        const guildMember = interaction.guild.members.resolve(user.id);
+        const guildData = await this.guardsman.database<IRoleBind>("verification_binds")
+        .where("guild_id", guild.id);
 
-        const existingUserData = await this.guardsman.database<IUser>("users")
-            .where("discord_id", user.id)
+        if (!guildData) {
+            await interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(Colors.Red)
+                        .setTitle("Update All")
+                        .setDescription(`Update all failed to due guild data being empty (for guild_id ${guild.id}).`)
+                ]
+            })
+
+            return;
+        };
+
+        const guildMembers = await guild.members.list({limit: 1000})
+
+        await interaction.reply({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(Colors.Orange)
+                    .setTitle("Verify All")
+                    .setDescription(`Updating all guild members. This may take some time.`)
+            ]
+        })
+
+        for (const guildMember of Array.from(guildMembers.values())) {
+
+            const existingUserData = await this.guardsman.database<IUser>("users")
+            .where("discord_id", guildMember.id)
             .first();
+            
+            if (!existingUserData) continue;
 
-        if (!existingUserData) {
-            await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle("Guardsman Verification")
-                        .setDescription(`<@${user.id}> is not verified with Guardsman.`)
-                        .setColor(Colors.Red)
-                        .setTimestamp()
-                        .setFooter({text: "Guardsman Verification"})
-                ]
-            })
-
-            return;
-        }
-
-        if (!guildMember)
-        {
-            await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle("Guardsman Verification")
-                        .setDescription(`<@${user.id}> is not a member of this guild.`)
-                        .setColor(Colors.Red)
-                        .setTimestamp()
-                        .setFooter({text: "Guardsman Verification"})
-                ]
-            })
-
-            return;
-        }
-
-        const verificationBinds = await this.guardsman.database<IRoleBind>("verification_binds")
-            .where("guild_id", guild.id);
-
-        const roleCache: { [groupId: number]: number } = {};
-        const allowedRoles: IRoleBind[] = [];
-        const removedRoles: IRoleBind[] = [];
-        const errors: string[] = [];
+            const roleCache: { [groupId: number]: number } = {};
+            const allowedRoles: IRoleBind[] = [];
+            const removedRoles: IRoleBind[] = [];
+            const errors: string[] = [];
 
         // parse allowed roles
-        for (const verificationBind of verificationBinds) {
+        for (const verificationBind of guildData) {
             const bindData: RoleData<any> = JSON.parse(verificationBind.role_data);
 
             const type = bindData.type;
@@ -146,7 +132,7 @@ export default class UpdateCommand implements ICommand
         //console.log(guildMember.roles.cache)
         for (const role of guildMember.roles.cache.keys())
         {
-            const isBoundRole = (verificationBinds.find(r => r.role_id == role && r.guild_id == guild.id)) != null
+            const isBoundRole = (guildData.find(r => r.role_id == role && r.guild_id == guild.id)) != null
             const allowedRole = allowedRoles.find(r => r.role_id == role);
 
             if (!allowedRole && isBoundRole)
@@ -208,38 +194,25 @@ export default class UpdateCommand implements ICommand
             }
         }
 
-        // Set nickname
-        try {
-             await guildMember.setNickname(existingUserData.username);
-        } catch (error) {
+          // Set nickname
+          try {
+            await guildMember.setNickname(existingUserData.username);
+          } catch (error) {
             errors.push(`Failed to set member nickname: ${error}`);
-        }
-
-        await interaction.reply({
+          }
+        
+          await interaction.channel?.send({
             embeds: [
                 new EmbedBuilder()
-                    .setTitle("Guardsman Verification")
-                    .setDescription(`Role update complete. See details below.`)
-                    .setColor(errors.length > 0 && Colors.Orange || Colors.Green)
-                    .setTimestamp()
-                    .setFooter({ text: "Guardsman Verification" })
-                    .addFields(
-                        {
-                            name: "Added Roles",
-                            value: `${allowedRoles.length > 0 && "• " || "None."}${allowedRoles.map(r => "<@&" + r.role_id + '>').join("\n • ")}`
-                        },
+                    .setColor((errors.length > 0 && Colors.Orange) || Colors.Green)
+                    .setTitle("User Update")
+                    .setDescription(`Update for <@${guildMember.id}> successful. ${errors.join("\n")}`)
+                    ]
+                })
+            }
 
-                        {
-                            name: "Removed Roles",
-                            value: `${removedRoles.length > 0 && "• " || "None."}${removedRoles.map(r => "<@&" + r.role_id + '>').join("\n •")}`
-                        },
-
-                        {
-                            name: "Errors",
-                            value: errors.length > 0 && errors.join("\n") || "None."
-                        }
-                    )
-            ]
+        await new Promise((resolve) => {
+            setTimeout(resolve, 5_000)
         })
     }
 }

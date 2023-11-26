@@ -111,7 +111,7 @@ export default class UpdateCommand implements ICommand
         }
 
         // scan user's current roles and verify they are allowed to have them
-        console.log(member.roles.cache)
+        //console.log(member.roles.cache)
         for (const role of member.roles.cache.keys())
         {
             const isBoundRole = (verificationBinds.find(r => r.role_id == role && r.guild_id == guild.id)) != null
@@ -174,6 +174,13 @@ export default class UpdateCommand implements ICommand
                     errors.push(error);
                 }
             }
+        }
+
+        // Set nickname
+        try {
+            await member.setNickname(existingUserData.username);
+        } catch (error) {
+            errors.push(`Failed to set member nickname: ${error}`);
         }
 
         await interaction.reply({
