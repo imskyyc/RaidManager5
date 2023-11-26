@@ -43,7 +43,7 @@ export default class UpdateCommand implements ICommand
                 embeds: [
                     new EmbedBuilder()
                         .setTitle("Guardsman Verification")
-                        .setDescription(`<@${user.id} is not verified with Guardsman.`)
+                        .setDescription(`<@${user.id}> is not verified with Guardsman.`)
                         .setColor(Colors.Red)
                         .setTimestamp()
                         .setFooter({text: "Guardsman Verification"})
@@ -59,7 +59,7 @@ export default class UpdateCommand implements ICommand
                 embeds: [
                     new EmbedBuilder()
                         .setTitle("Guardsman Verification")
-                        .setDescription(`<@${user.id} is not a member of this guild.`)
+                        .setDescription(`<@${user.id}> is not a member of this guild.`)
                         .setColor(Colors.Red)
                         .setTimestamp()
                         .setFooter({text: "Guardsman Verification"})
@@ -143,7 +143,7 @@ export default class UpdateCommand implements ICommand
         }
 
         // scan user's current roles and verify they are allowed to have them
-        console.log(guildMember.roles.cache)
+        //console.log(guildMember.roles.cache)
         for (const role of guildMember.roles.cache.keys())
         {
             const isBoundRole = (verificationBinds.find(r => r.role_id == role && r.guild_id == guild.id)) != null
@@ -206,6 +206,13 @@ export default class UpdateCommand implements ICommand
                     errors.push(error);
                 }
             }
+        }
+
+        // Set nickname
+        try {
+             await guildMember.setNickname(existingUserData.username);
+        } catch (error) {
+            errors.push(`Failed to set member nickname: ${error}`);
         }
 
         await interaction.reply({

@@ -3,13 +3,15 @@ import {
     ApplicationCommandOptionBase,
     ChatInputCommandInteraction, Colors, EmbedBuilder,
     SlashCommandNumberOption,
-    SlashCommandRoleOption
+    SlashCommandRoleOption,
+    PermissionFlagsBits
 } from "discord.js";
 
 export default class UnbindGamePassSubcommand implements ICommand {
     name: Lowercase<string> = "gamepass";
     description: string = "Allows guild administrators to unbind ROBLOX gamepass data from the guild.";
     guardsman: Guardsman;
+    defaultMemberPermissions = PermissionFlagsBits.ManageRoles;
     options: ApplicationCommandOptionBase[] = [
         new SlashCommandRoleOption()
             .setName("role")

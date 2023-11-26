@@ -3,7 +3,8 @@ import {
     ApplicationCommandOptionBase,
     ChatInputCommandInteraction, Colors, EmbedBuilder,
     SlashCommandNumberOption,
-    SlashCommandRoleOption
+    SlashCommandRoleOption,
+    PermissionFlagsBits
 } from "discord.js";
 
 export default class BindGroupSubcommand implements ICommand
@@ -11,6 +12,7 @@ export default class BindGroupSubcommand implements ICommand
     name: Lowercase<string> = "group";
     description: string = "Allows guild administrators to bind ROBLOX group data to the guild for users to obtain roles.";
     guardsman: Guardsman;
+    defaultMemberPermissions = PermissionFlagsBits.ManageRoles;
     options: ApplicationCommandOptionBase[] = [
         new SlashCommandRoleOption()
             .setName("role")
