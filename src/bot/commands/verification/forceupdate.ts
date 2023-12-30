@@ -9,8 +9,7 @@ import { Guardsman } from "index";
 import Noblox from "noblox.js";
 import axios from "axios";
 
-export default class UpdateCommand implements ICommand
-{
+export default class UpdateCommand implements ICommand {
     name: Lowercase<string> = "forceupdate";
     description: string = "Allows guild admins to force update a user's Discord roles.";
     guardsman: Guardsman;
@@ -23,8 +22,7 @@ export default class UpdateCommand implements ICommand
             .setRequired(true)
     ]
 
-    constructor(guardsman: Guardsman)
-    {
+    constructor(guardsman: Guardsman) {
         this.guardsman = guardsman;
     }
 
@@ -46,15 +44,14 @@ export default class UpdateCommand implements ICommand
                         .setDescription(`<@${user.id}> is not verified with Guardsman.`)
                         .setColor(Colors.Red)
                         .setTimestamp()
-                        .setFooter({text: "Guardsman Verification"})
+                        .setFooter({ text: "Guardsman Verification" })
                 ]
             })
 
             return;
         }
 
-        if (!guildMember)
-        {
+        if (!guildMember) {
             await interaction.reply({
                 embeds: [
                     new EmbedBuilder()
@@ -62,7 +59,7 @@ export default class UpdateCommand implements ICommand
                         .setDescription(`<@${user.id}> is not a member of this guild.`)
                         .setColor(Colors.Red)
                         .setTimestamp()
-                        .setFooter({text: "Guardsman Verification"})
+                        .setFooter({ text: "Guardsman Verification" })
                 ]
             })
 
@@ -113,7 +110,7 @@ export default class UpdateCommand implements ICommand
                         let userOwnsGamepass = false;
 
                         try {
-                            const apiUrl = `https://inventory.roblox.com/v1/users/62097945/items/1/${gamepassId}/is-owned`
+                            const apiUrl = `https://inventory.roblox.com/v1/users/${existingUserData.roblox_id}/items/1/${gamepassId}/is-owned`
                             const returnedApiData = await axios.get(apiUrl);
                             userOwnsGamepass = returnedApiData.data == "true";
                         } catch (error: any) {
@@ -144,13 +141,11 @@ export default class UpdateCommand implements ICommand
 
         // scan user's current roles and verify they are allowed to have them
         //console.log(guildMember.roles.cache)
-        for (const role of guildMember.roles.cache.keys())
-        {
+        for (const role of guildMember.roles.cache.keys()) {
             const isBoundRole = (verificationBinds.find(r => r.role_id == role && r.guild_id == guild.id)) != null
             const allowedRole = allowedRoles.find(r => r.role_id == role);
 
-            if (!allowedRole && isBoundRole)
-            {
+            if (!allowedRole && isBoundRole) {
                 removedRoles.push({
                     id: -1,
                     guild_id: guild.id,
@@ -168,41 +163,32 @@ export default class UpdateCommand implements ICommand
         }
 
         // remove roles
-        for (const removedRole of removedRoles)
-        {
+        for (const removedRole of removedRoles) {
             const userRole = guildMember.roles.resolve(removedRole.role_id);
-            if (userRole)
-            {
-                try
-                {
+            if (userRole) {
+                try {
                     await guildMember.roles.remove(removedRole.role_id);
                 }
-                catch (error: any)
-                {
+                catch (error: any) {
                     errors.push(error);
                 }
             }
         }
 
         // add roles
-        for (const allowedRole of allowedRoles)
-        {
+        for (const allowedRole of allowedRoles) {
             const userRole = guildMember.roles.resolve(allowedRole.role_id);
-            if (!userRole)
-            {
+            if (!userRole) {
                 const guildRole = guild.roles.resolve(allowedRole.role_id);
-                if (!guildRole)
-                {
+                if (!guildRole) {
                     errors.push(`Failed to find role for bind ${allowedRole.id}`);
                     continue;
                 }
 
-                try
-                {
+                try {
                     await guildMember.roles.add(guildRole);
                 }
-                catch (error: any)
-                {
+                catch (error: any) {
                     errors.push(error);
                 }
             }
@@ -210,7 +196,7 @@ export default class UpdateCommand implements ICommand
 
         // Set nickname
         try {
-             await guildMember.setNickname(existingUserData.username);
+            await guildMember.setNickname(existingUserData.username);
         } catch (error) {
             errors.push(`Failed to set member nickname: ${error}`);
         }
