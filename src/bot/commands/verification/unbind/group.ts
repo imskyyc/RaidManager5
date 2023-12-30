@@ -7,8 +7,7 @@ import {
     PermissionFlagsBits
 } from "discord.js";
 
-export default class UnbindGroupSubcommand implements ICommand
-{
+export default class UnbindGroupSubcommand implements ICommand {
     name: Lowercase<string> = "group";
     description: string = "Allows guild administrators to unbind ROBLOX group data from the guild.";
     guardsman: Guardsman;
@@ -30,13 +29,11 @@ export default class UnbindGroupSubcommand implements ICommand
             .setDescription("The maximum rank to obtain the role.")
     ];
 
-    constructor(guardsman: Guardsman)
-    {
+    constructor(guardsman: Guardsman) {
         this.guardsman = guardsman;
     }
 
-    async execute(interaction: ChatInputCommandInteraction<"cached">): Promise<void>
-    {
+    async execute(interaction: ChatInputCommandInteraction<"cached">): Promise<void> {
         const options = interaction.options;
         const guild = interaction.guild;
 
@@ -50,7 +47,7 @@ export default class UnbindGroupSubcommand implements ICommand
             type: "group",
             groupId: groupId,
             minRank: minRank || 0,
-            maxRank: maxRank || 255
+            maxRank: typeof maxRank === 'number' ? maxRank : 255
         }
 
         const existingRole = await this.guardsman.database<IRoleBind>("verification_binds")
@@ -61,16 +58,15 @@ export default class UnbindGroupSubcommand implements ICommand
             })
             .first();
 
-        if (!existingRole)
-        {
+        if (!existingRole) {
             await interaction.reply({
                 embeds: [
-                   new EmbedBuilder()
-                       .setTitle("Guardsman Database")
-                       .setDescription(`A group role bind for <@&${guildRole.id}> with those properties does not exist.`)
-                       .setColor(Colors.Red)
-                       .setTimestamp()
-                       .setFooter({ text: "Guardsman Database" })
+                    new EmbedBuilder()
+                        .setTitle("Guardsman Database")
+                        .setDescription(`A group role bind for <@&${guildRole.id}> with those properties does not exist.`)
+                        .setColor(Colors.Red)
+                        .setTimestamp()
+                        .setFooter({ text: "Guardsman Database" })
                 ]
             });
 
