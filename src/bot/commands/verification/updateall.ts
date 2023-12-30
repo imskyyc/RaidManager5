@@ -188,18 +188,29 @@ export default class UpdateAllCommand implements ICommand {
                 errors.push(`Failed to set member nickname: ${error}`);
             }
 
-            await interaction.channel?.send({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor((errors.length > 0 && Colors.Orange) || Colors.Green)
-                        .setTitle("User Update")
-                        .setDescription(`Update for <@${guildMember.id}> successful. ${errors.join("\n")}`)
-                ]
+            if (errors.length > 0) {
+                await interaction.channel?.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor(Colors.Orange)
+                            .setTitle("User Update")
+                            .setDescription(`Update for <@${guildMember.id}> ran into a slight problem that may or may not impact the user. Errors: ${errors.join("\n")}`)
+                    ]
+                })
+            }
+
+            await new Promise((resolve) => {
+                setTimeout(resolve, 5_000)
             })
         }
 
-        await new Promise((resolve) => {
-            setTimeout(resolve, 5_000)
+        await interaction.channel?.send({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(Colors.Green)
+                    .setTitle("Update All")
+                    .setDescription(`Update all completed.`)
+            ]
         })
     }
 }
