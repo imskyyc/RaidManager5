@@ -31,6 +31,8 @@ export default class UpdateAllCommand implements ICommand {
                         .setColor(Colors.Red)
                         .setTitle("Update All")
                         .setDescription(`Update all failed to due guild data being empty (for guild_id ${guild.id}).`)
+                        .setTimestamp()
+                        .setFooter({ text: "Guardsman Verification" })
                 ]
             })
 
@@ -45,6 +47,8 @@ export default class UpdateAllCommand implements ICommand {
                     .setColor(Colors.Orange)
                     .setTitle("Verify All")
                     .setDescription(`Updating all guild members. This may take some time.`)
+                    .setTimestamp()
+                    .setFooter({ text: "Guardsman Verification" })
             ]
         })
 
@@ -195,6 +199,8 @@ export default class UpdateAllCommand implements ICommand {
                             .setColor(Colors.Orange)
                             .setTitle("User Update")
                             .setDescription(`Update for <@${guildMember.id}> ran into a slight problem that may or may not impact the user. Errors: ${errors.join("\n")}`)
+                            .setTimestamp()
+                            .setFooter({ text: "Guardsman Verification" })
                     ]
                 })
             }
@@ -210,6 +216,8 @@ export default class UpdateAllCommand implements ICommand {
                     .setColor(Colors.Green)
                     .setTitle("Update All")
                     .setDescription(`Update all completed.`)
+                    .setTimestamp()
+                    .setFooter({ text: "Guardsman Verification" })
             ]
         })
     }

@@ -170,31 +170,33 @@ export default class UpdateCommand implements ICommand {
             errors.push(`Failed to set member nickname: ${error}`);
         }
 
+        let InfoEmbed = new EmbedBuilder()
+            .setTitle("Guardsman Verification")
+            .setDescription(`Role update complete. See details below.`)
+            .setColor(errors.length > 0 && Colors.Orange || Colors.Green)
+            .setTimestamp()
+            .setFooter({ text: "Guardsman Verification" })
+            .addFields(
+                {
+                    name: "Added Roles",
+                    value: `${allowedRoles.length > 0 && "• " || "None."}${allowedRoles.map(r => "<@&" + r.role_id + '>').join("\n • ")}`
+                },
+
+                {
+                    name: "Removed Roles",
+                    value: `${removedRoles.length > 0 && "• " || "None."}${removedRoles.map(r => "<@&" + r.role_id + '>').join("\n •")}`
+                }
+            );
+
+        if (errors.length > 0) {
+            InfoEmbed.addFields({
+                name: "Errors",
+                value: errors.join("\n")
+            });
+        }
+
         await interaction.reply({
-            embeds: [
-                new EmbedBuilder()
-                    .setTitle("Guardsman Verification")
-                    .setDescription(`Role update complete. See details below.`)
-                    .setColor(errors.length > 0 && Colors.Orange || Colors.Green)
-                    .setTimestamp()
-                    .setFooter({ text: "Guardsman Verification" })
-                    .addFields(
-                        {
-                            name: "Added Roles",
-                            value: `${allowedRoles.length > 0 && "• " || "None."}${allowedRoles.map(r => "<@&" + r.role_id + '>').join("\n • ")}`
-                        },
-
-                        {
-                            name: "Removed Roles",
-                            value: `${removedRoles.length > 0 && "• " || "None."}${removedRoles.map(r => "<@&" + r.role_id + '>').join("\n •")}`
-                        },
-
-                        {
-                            name: "Errors",
-                            value: errors.length > 0 && errors.join("\n") || "None."
-                        }
-                    )
-            ]
+            embeds: [InfoEmbed]
         })
     }
 }
