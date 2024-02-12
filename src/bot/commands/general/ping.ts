@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, Colors } from "discord.js";
 import { Guardsman } from "index";
 
 export default class PingCommand implements ICommand {
@@ -11,7 +11,7 @@ export default class PingCommand implements ICommand {
     }
 
     async execute(interaction: ChatInputCommandInteraction<"cached">): Promise<void> {
-        const embed = new EmbedBuilder().setDescription("`Pinging...`").setColor("#3498db");
+        const embed = new EmbedBuilder().setDescription("`Pinging...`").setColor(Colors.Yellow);
         const msg = await interaction.reply({ embeds: [embed], fetchReply: true });
         const timestamp = interaction.createdTimestamp;
         const latency = `\`\`\`ini\n[ ${Math.floor(msg.createdTimestamp - timestamp)}ms ]\`\`\``;
@@ -23,6 +23,7 @@ export default class PingCommand implements ICommand {
                 { name: "Latency", value: latency, inline: true },
                 { name: "API Latency", value: apiLatency, inline: true },
             ])
+            .setColor(Colors.Green)
             .setTimestamp()
             .setFooter({ text: "RaidManager" });
         msg.edit({ embeds: [embed] });
